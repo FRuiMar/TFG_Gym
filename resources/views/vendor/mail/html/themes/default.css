@@ -1,0 +1,303 @@
+/* Base */
+body,
+body *:not(html):not(style):not(br):not(tr):not(code) {
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+        "Segoe UI Symbol";
+    position: relative;
+}
+
+body {
+    -webkit-text-size-adjust: none;
+    background-color: #1a202c; /* Fondo oscuro general */
+    color: #e2e8f0;
+    height: 100%;
+    line-height: 1.4;
+    margin: 0;
+    padding: 0;
+    width: 100% !important;
+}
+
+p,
+ul,
+ol,
+blockquote {
+    line-height: 1.4;
+    text-align: left;
+}
+
+a {
+    color: #f56565; /* Rojo más claro para enlaces */
+}
+
+a img {
+    border: none;
+}
+
+/* Typography */
+
+h1 {
+    color: #f56565; /* Color rojo para títulos */
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 0;
+    text-align: left;
+}
+
+h2 {
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 0;
+    text-align: left;
+}
+
+h3 {
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 0;
+    text-align: left;
+}
+
+p {
+    font-size: 16px;
+    line-height: 1.5em;
+    margin-top: 0;
+    text-align: left;
+    color: #e2e8f0;
+}
+
+p.sub {
+    font-size: 12px;
+    color: #cbd5e0;
+}
+
+img {
+    max-width: 100%;
+}
+
+/* Layout */
+
+.wrapper {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    background-color: #1a202c; /* Fondo oscuro */
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.content {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+/* Header */
+
+.header {
+    padding: 25px 0;
+    text-align: center;
+    /*background-color: #2d3748; /* Gris oscuro para el header */
+}
+
+.header a {
+    color: #ffffff;
+    font-size: 19px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+/* Logo */
+
+.logo {
+    height: 75px;
+    max-height: 75px;
+    width: 75px;
+}
+
+/* Body */
+
+.body {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    background-color: #1a202c; /* Fondo oscuro */
+    border-bottom: 1px solid #2d3748;
+    border-top: 1px solid #2d3748;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.inner-body {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 570px;
+    background-color: #2d3748; /* Contenedor en gris oscuro */
+    border-color: #c53030; /* Borde rojo */
+    border-radius: 8px;
+    border-width: 2px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    margin: 0 auto;
+    padding: 0;
+    width: 570px;
+}
+
+.inner-body a {
+    word-break: break-all;
+}
+
+/* Subcopy */
+
+.subcopy {
+    border-top: 1px solid #4a5568;
+    margin-top: 25px;
+    padding-top: 25px;
+}
+
+.subcopy p {
+    font-size: 14px;
+    color: #a0aec0;
+}
+
+/* Footer */
+
+.footer {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 570px;
+    margin: 0 auto;
+    padding: 0;
+    text-align: center;
+    width: 570px;
+}
+
+.footer p {
+    color: #a0aec0;
+    font-size: 12px;
+    text-align: center;
+}
+
+.footer a {
+    color: #f56565; /* Enlaces en rojo en el footer */
+    text-decoration: underline;
+}
+
+/* Tables */
+
+.table table {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    margin: 30px auto;
+    width: 100%;
+}
+
+.table th {
+    border-bottom: 1px solid #4a5568;
+    margin: 0;
+    padding-bottom: 8px;
+    color: #f56565; /* Cabeceras de tabla en rojo */
+}
+
+.table td {
+    color: #e2e8f0;
+    font-size: 15px;
+    line-height: 18px;
+    margin: 0;
+    padding: 10px 0;
+}
+
+.content-cell {
+    max-width: 100vw;
+    padding: 32px;
+}
+
+/* Buttons */
+
+.action {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    margin: 30px auto;
+    padding: 0;
+    text-align: center;
+    width: 100%;
+    float: unset;
+}
+
+.button {
+    -webkit-text-size-adjust: none;
+    border-radius: 4px;
+    color: #fff;
+    display: inline-block;
+    overflow: hidden;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.button-blue,
+.button-primary {
+    background-color: #c53030; /* Botón principal en rojo */
+    border-bottom: 8px solid #c53030;
+    border-left: 18px solid #c53030;
+    border-right: 18px solid #c53030;
+    border-top: 8px solid #c53030;
+}
+
+.button-green,
+.button-success {
+    background-color: #68d391;
+    border-bottom: 8px solid #68d391;
+    border-left: 18px solid #68d391;
+    border-right: 18px solid #68d391;
+    border-top: 8px solid #68d391;
+}
+
+.button-red,
+.button-error {
+    background-color: #e53e3e;
+    border-bottom: 8px solid #e53e3e;
+    border-left: 18px solid #e53e3e;
+    border-right: 18px solid #e53e3e;
+    border-top: 8px solid #e53e3e;
+}
+
+/* Panels */
+
+.panel {
+    border-left: #c53030 solid 4px; /* Panel con borde rojo */
+    margin: 21px 0;
+}
+
+.panel-content {
+    background-color: #2d3748;
+    color: #e2e8f0;
+    padding: 16px;
+}
+
+.panel-content p {
+    color: #e2e8f0;
+}
+
+.panel-item {
+    padding: 0;
+}
+
+.panel-item p:last-of-type {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+/* Utilities */
+
+.break-all {
+    word-break: break-all;
+}
