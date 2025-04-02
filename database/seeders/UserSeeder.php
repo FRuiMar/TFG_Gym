@@ -12,25 +12,158 @@ class UserSeeder extends Seeder
     {
         // Crear un usuario administrador
         User::create([
-            'dni' => '11111111A', // DNI único
-            'name' => 'Admin User',
-            'email' => 'f@f.com',
-            'password' => Hash::make('12345'), // Contraseña fija: 12345
-            'role' => 'ADMIN', // Rol de administrador
-            'image' => null, // Sin imagen
-            'membership_id' => 1,
+            'dni' => '11111111A',
+            'name' => 'Admin',
+            'surname' => 'System',
+            'surname2' => null,
+            'email' => 'admin@admin.com',
+            'password' => Hash::make('12345678'),
+            'role' => 'ADMIN',
+            'sexo' => 'NC',
+            'weight' => null,
+            'height' => null,
+            'birth_date' => null,
+            'phone' => '600111222',
+            'emergency_contact' => null,
+            'health_conditions' => null,
+            'specialty_1' => null,
+            'specialty_2' => null,
+            'notifications_enabled' => true,
+            'image' => null,
+            'membership_id' => null,
+            'active' => true,
+            'email_verified_at' => now(),
         ]);
 
         // Crear un usuario normal
         User::create([
-            'dni' => '22222222B', // DNI único
-            'name' => 'Normal User',
-            'email' => 'f2@f.com',
-            'password' => Hash::make('12345'), // Contraseña fija: 12345
-            'role' => 'NORMAL', // Rol normal
-            'image' => null, // Sin imagen
-            'membership_id' => 2,
+            'dni' => '22222222B',
+            'name' => 'Usuario',
+            'surname' => 'Normal',
+            'surname2' => 'Prueba',
+            'email' => 'user@user.com',
+            'password' => Hash::make('12345678'),
+            'role' => 'NORMAL',
+            'sexo' => 'H',
+            'weight' => 75.5,
+            'height' => 1.80,
+            'birth_date' => '1990-05-15',
+            'phone' => '600333444',
+            'emergency_contact' => 'Familiar: 600555666',
+            'health_conditions' => 'Ninguna',
+            'specialty_1' => null,
+            'specialty_2' => null,
+            'notifications_enabled' => true,
+            'image' => null,
+            'membership_id' => 1, // ID de una membresía básica
+            'active' => true,
+            'email_verified_at' => now(),
         ]);
+
+
+
+
+
+        // Crear entrenadores (antes en TrainerSeeder)
+        // Por orden de creación serán id 3, 4, 5, 6
+        User::create([
+            'dni' => '12312312A',
+            'name' => 'Pepe',
+            'surname' => 'Powers',
+            'surname2' => null,
+            'email' => 'pepe@forza.com',
+            'password' => Hash::make('12345678'), // Cambié por la misma contraseña que los otros
+            'role' => 'TRAINER',
+            'sexo' => 'H',
+            'weight' => 85.0,
+            'height' => 1.85,
+            'birth_date' => '1985-02-10',
+            'phone' => '600123456',
+            'emergency_contact' => 'Familiar: 600789012',
+            'health_conditions' => null,
+            'specialty_1' => 'Zumba',
+            'specialty_2' => 'Merengue',
+            'notifications_enabled' => true,
+            'image' => null,
+            'membership_id' => null,
+            'active' => true,
+            'email_verified_at' => now(),
+        ]);
+
+        User::create([
+            'dni' => '12121212A',
+            'name' => 'Fali',
+            'surname' => 'Fortachon',
+            'surname2' => null,
+            'email' => 'fali@forza.com',
+            'password' => Hash::make('12345678'), // Cambié por la misma contraseña que los otros
+            'role' => 'TRAINER',
+            'sexo' => 'H',
+            'weight' => 90.0,
+            'height' => 1.90,
+            'birth_date' => '1988-06-15',
+            'phone' => '600234567',
+            'emergency_contact' => null,
+            'health_conditions' => null,
+            'specialty_1' => 'PowerGym',
+            'specialty_2' => 'Crossfit',
+            'notifications_enabled' => true,
+            'image' => null,
+            'membership_id' => null,
+            'active' => true,
+            'email_verified_at' => now(),
+        ]);
+
+        User::create([
+            'dni' => '13131313A',
+            'name' => 'Rafa',
+            'surname' => 'Rapid',
+            'surname2' => null,
+            'email' => 'rafa@forza.com',
+            'password' => Hash::make('12345678'), // Cambié por la misma contraseña que los otros
+            'role' => 'TRAINER',
+            'sexo' => 'H',
+            'weight' => 75.0,
+            'height' => 1.78,
+            'birth_date' => '1990-11-22',
+            'phone' => '600345678',
+            'emergency_contact' => null,
+            'health_conditions' => null,
+            'specialty_1' => 'Salsa',
+            'specialty_2' => 'Yoga',
+            'notifications_enabled' => true,
+            'image' => null,
+            'membership_id' => null,
+            'active' => true,
+            'email_verified_at' => now(),
+        ]);
+
+        User::create([
+            'dni' => '14141414A',
+            'name' => 'Manolo',
+            'surname' => 'McGym',
+            'surname2' => null,
+            'email' => 'manolo@forza.com',
+            'password' => Hash::make('12345678'), // Cambié por la misma contraseña que los otros
+            'role' => 'TRAINER',
+            'sexo' => 'H',
+            'weight' => 82.0,
+            'height' => 1.82,
+            'birth_date' => '1983-04-30',
+            'phone' => '600456789',
+            'emergency_contact' => null,
+            'health_conditions' => null,
+            'specialty_1' => 'Step',
+            'specialty_2' => 'HIIT',
+            'notifications_enabled' => true,
+            'image' => null,
+            'membership_id' => null,
+            'active' => true,
+            'email_verified_at' => now(),
+        ]);
+
+
+
 
         // Crear 10 usuarios de prueba usando el factory
         User::factory()->count(10)->create();

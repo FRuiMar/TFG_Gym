@@ -4,31 +4,37 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Activity extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
-    // Campos que se pueden asignar masivamente
     protected $fillable = [
-        'name',
-        'schedule',
-        'max_capacity',
-        'trainer_id',
-        'image',
+        'nombre',
+        'descripcion',
+        'duracion_minutos',
+        'nivel_dificultad',
+        'imagen',
+        'calories_burned',
+        'active'
     ];
 
-    // Relación muchos a muchos con usuarios (a través de la tabla pivote activity_user)
-    public function users()
+    // Relación con sesiones
+    public function sessions()
     {
-        return $this->belongsToMany(User::class, 'activity_user', 'activity_id', 'user_id')
-            ->withPivot('reservation_date');
+        return $this->hasMany(ClassSession::class);
     }
 
-    // Relación con entrenadores
-    public function trainer()
+    // Entrenadores especializados en esta actividad (como primera especialidad)
+    public function specialistTrainers1()
     {
-        return $this->belongsTo(Trainer::class, 'trainer_id');
+        return $this->hasMany(User::class, 'specialty_1_id');
+    }
+
+    // Entrenadores especializados en esta actividad (como segunda especialidad)
+    public function specialistTrainers2()
+    {
+        return $this->hasMany(User::class, 'specialty_2_id');
     }
 }

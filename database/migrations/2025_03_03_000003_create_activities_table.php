@@ -13,12 +13,15 @@ return new class extends Migration
     {
         Schema::create('activities', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('schedule');
-            $table->integer('max_capacity');
-            $table->foreignId('trainer_id')->nullable()->constrained('trainers')->onDelete('set null'); // Relación con entrenadores
-            $table->string('image')->nullable(); // Imagen (puede ser nula)
-            $table->timestamps(); // created_at y updated_at
+            $table->string('nombre', 100);
+            $table->text('descripcion')->nullable();
+            $table->integer('duracion_minutos');
+            $table->enum('nivel_dificultad', ['bajo', 'medio', 'alto']);
+            $table->string('imagen')->nullable();
+            $table->integer('calories_burned')->nullable();
+            $table->boolean('active')->default(true);
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 

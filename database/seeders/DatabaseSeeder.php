@@ -14,14 +14,17 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
 
-        // Ejecutar el Trainer primero.
-        $this->call([
-            TrainerSeeder::class,
-        ]);
 
-        // Ejecutar el MembershipSeeder después.
+        // Ejecutar el MembershipSeeder primero.
         $this->call([
             MembershipSeeder::class,
+            MembershipBenefitSeeder::class,
+        ]);
+
+
+        // Luego ejecutar el ActivitySeeder
+        $this->call([
+            ActivitySeeder::class,
         ]);
 
 
@@ -30,9 +33,9 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
         ]);
 
-        // Luego ejecutar el ActivitySeeder
+        // Finalmente sesiones (que dependen de actividades y usuarios/entrenadores)
         $this->call([
-            ActivitySeeder::class,
+            ClassSessionSeeder::class,
         ]);
     }
 }

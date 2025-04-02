@@ -13,10 +13,13 @@ return new class extends Migration
     {
         Schema::create('memberships', function (Blueprint $table) {
             $table->id();
-            $table->string('type'); // Tipo de membresía (Mensual, Trimestral, Anual, etc.)
-            $table->float('price');
-            $table->integer('duration_months'); // Duración en meses
-            $table->timestamps(); // created_at y updated_at
+            $table->string('name', 100);
+            $table->text('description')->nullable();
+            $table->decimal('price', 8, 2);
+            $table->integer('duration_months');
+            $table->boolean('active')->default(true);
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 
