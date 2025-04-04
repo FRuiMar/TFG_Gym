@@ -78,7 +78,7 @@
 
                 <!-- Componente de tarjetas de actividades -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    @if (isset($activities))
+                    @if (isset($activities) && $activities->count() > 0)
                         @foreach ($activities as $activity)
                             <x-activity-card :activity="$activity" :showReservationButton="true" />
                         @endforeach

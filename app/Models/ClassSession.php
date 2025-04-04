@@ -29,6 +29,7 @@ class ClassSession extends Model
     protected $casts = [
         'hora_inicio' => 'datetime',
         'hora_fin' => 'datetime',
+        'is_active' => 'boolean',
     ];
 
     // Relación con actividad
@@ -58,5 +59,29 @@ class ClassSession extends Model
             ->count();
 
         return $count < $this->capacidad_max;
+    }
+
+    // Usuarios registrados a través de reservas
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'reservations', 'session_id', 'user_id')
+            ->withPivot(['fecha', 'estado', 'check_in_time'])
+            ->withTimestamps();
+    }
+
+    // Obtener nombre del día en español
+    public function getDayNameAttribute()
+    {
+        $dias = [
+            'Lunes' => 'Lunes',
+            'Martes' => 'Martes',
+            'Miércoles' => 'Miércoles',
+            'Jueves' => 'Jueves',
+            'Viernes' => 'Viernes',
+            'Sábado' => 'Sábado',
+            'Domingo' => 'Domingo'
+        ];
+
+        return $dias[$this->dia_semana] ?? $this->dia_semana;
     }
 }

@@ -22,23 +22,44 @@ class UserController extends Controller
     // Mostrar lista de usuarios
     public function index()
     {
-        $users = User::with('membership')->get();
+        // Antes: $users = User::with('membership')->get();
+        // Ahora:
+        $users = User::with(['membership', 'userMemberships' => function ($query) {
+            $query->where('is_active', true)->latest();
+        }])->get();
+
         return view('users.index', compact('users'));
     }
+
 
     // Mostrar detalles de un usuario específico
     public function show(User $user)
     {
-        $user->load('membership', 'activities');
+        // Antes: $user->load('membership', 'activities');
+        // Ahora:
+        $user->load([
+            'membership',
+            'userMemberships' => function ($query) {
+                $query->orderBy('start_date', 'desc');
+            },
+            'reservations' => function ($query) {
+                $query->with(['classSession.activity', 'classSession.trainer']);
+            }
+        ]);
+
         return view('users.show', compact('user'));
     }
+
+
 
     // Mostrar formulario de creación
     public function create()
     {
-        $memberships = Membership::all();
+        $memberships = Membership::where('activo', true)->get();
         return view('users.create', compact('memberships'));
     }
+
+
 
     // Guardar un nuevo usuario
     public function store(UserStoreRequest $request)
@@ -47,14 +68,47 @@ class UserController extends Controller
 
             $validated = $request->validated();
 
+            // Para la imagen
             if ($request->hasFile('image')) {
                 $path = $request->file('image')->store('users', 'public');
                 $validated['image'] = $path;
             }
 
+            // Encriptamos la contraseña, si existe
             $validated['password'] = Hash::make($validated['password']);
 
-            User::create($validated);
+            // -NUEVO-
+            // Confirmo que los campos de entrenador son null si el role no es 'TRAINER'
+            if (isset($validated['role']) && $validated['role'] !== 'TRAINER') {
+                $validated['specialty_1'] = null;
+                $validated['specialty_2'] = null;
+            }
+
+
+            //Creo el usuario /////PEEEEROOO lo guardo en una variable para luego usarla para el registro de la membresía
+            $user = User::create($validated);
+
+
+            // -NUEVO- para el registro de membresía, para el histórico
+            // Si tiene membresía, crear el registro en user_memberships
+            if (!empty($validated['membership_id'])) {
+                $membership = Membership::find($validated['membership_id']);
+                if ($membership) {
+                    $user->userMemberships()->create([
+                        'membership_id' => $validated['membership_id'],
+                        'start_date' => now(),
+                        'end_date' => now()->addMonths($membership->duracion_meses),
+                        'payment_status' => 'paid',
+                        'last_payment_date' => now(),
+                        'next_payment_date' => now()->addMonths(1),
+                        'amount_paid' => $membership->precio,
+                        'is_active' => true,
+                    ]);
+                }
+            }
+
+
+
             return redirect()->route('users.index')->with('success', 'Usuario creado correctamente.');
         } catch (\Illuminate\Database\QueryException $e) {
             // Error de base de datos (duplicados, restricciones, etc)
@@ -81,12 +135,16 @@ class UserController extends Controller
         }
     }
 
+
+
     // Mostrar formulario de edición
     public function edit(User $user)
     {
-        $memberships = Membership::all();
+        $memberships = Membership::where('activo', true)->get();
         return view('users.edit', compact('user', 'memberships'));
     }
+
+
 
     // Actualizar usuario
     public function update(UserUpdateRequest $request, User $user)
@@ -105,13 +163,49 @@ class UserController extends Controller
                 $validated['image'] = $path;
             }
 
+
+            // Encripto la contraseña, si existe
             if (isset($validated['password']) && $validated['password']) {
                 $validated['password'] = Hash::make($validated['password']);
             } else {
                 unset($validated['password']);
             }
 
+
+            // Asegurarnos que los campos de entrenador son null si el role no es 'trainer'
+            if (isset($validated['role']) && $validated['role'] !== 'trainer') {
+                $validated['specialty_1'] = null;
+                $validated['specialty_2'] = null;
+            }
+
+            // Verificar si hubo cambio de membresía
+            $membershipChanged = isset($validated['membership_id']) &&
+                $user->membership_id != $validated['membership_id'];
+
+            // Actualizar usuario
             $user->update($validated);
+
+            // Si cambió la membresía, actualizar historial
+            if ($membershipChanged && !empty($validated['membership_id'])) {
+                // Desactivar registro de membresía actual
+                $user->userMemberships()->where('is_active', true)->update(['is_active' => false]);
+
+                // Crear nuevo registro de membresía actual
+                $membership = Membership::find($validated['membership_id']);
+                if ($membership) {
+                    $user->userMemberships()->create([
+                        'membership_id' => $validated['membership_id'],
+                        'start_date' => now(),
+                        'end_date' => now()->addMonths($membership->duracion_meses),
+                        'payment_status' => 'paid',
+                        'last_payment_date' => now(),
+                        'next_payment_date' => now()->addMonths(1),
+                        'amount_paid' => $membership->precio,
+                        'is_active' => true,
+                    ]);
+                }
+            }
+
             return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
         } catch (\Illuminate\Database\QueryException $e) {
             // Error de base de datos
@@ -134,159 +228,39 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         try {
-            // Verificar si el usuario tiene relaciones importantes
-            if ($user->activities()->count() > 0) {
-                return back()->with('warning', 'No se puede eliminar el usuario porque tiene actividades asociadas.');
+            // Verificar si el usuario tiene reservas activas
+            $hasActiveReservations = $user->reservations()
+                ->where('fecha', '>=', now())
+                ->where('estado', 'confirmada')
+                ->exists();
+
+            if ($hasActiveReservations) {
+                return back()->with('warning', 'No se puede eliminar el usuario porque tiene reservas activas.');
             }
 
-            // Puedes agregar más verificaciones de relaciones según tu modelo
+            // Verificar si el usuario es un entrenador con sesiones programadas
+            if ($user->role === 'trainer') {
+                $hasScheduledSessions = $user->trainerSessions()
+                    ->where('is_active', true)
+                    ->exists();
+
+                if ($hasScheduledSessions) {
+                    return back()->with('warning', 'No se puede eliminar el entrenador porque tiene sesiones programadas.');
+                }
+            }
 
             // Eliminar la imagen si existe
             if ($user->image && Storage::disk('public')->exists($user->image)) {
                 Storage::disk('public')->delete($user->image);
             }
 
+            // Para borrado suave, puedes usar:
             $user->delete();
+
             return redirect()->route('users.index')->with('success', 'Usuario eliminado correctamente.');
-        } catch (\Illuminate\Database\QueryException $e) {
-            Log::error('Error al eliminar usuario (DB): ' . $e->getMessage());
-
-            // Comprobar si es un error de restricción de clave foránea
-            if (str_contains($e->getMessage(), 'foreign key constraint fails')) {
-                return back()->with('error', 'No se puede eliminar el usuario porque tiene relaciones en la base de datos.');
-            }
-
-            return back()->with('error', 'Error de base de datos al eliminar el usuario.');
         } catch (\Exception $e) {
             Log::error('Error al eliminar usuario: ' . $e->getMessage());
             return back()->with('error', 'Ha ocurrido un error al eliminar el usuario.');
         }
-    }
-
-
-
-
-    public function myReservations()
-    {
-        // Obtiene el usuario autenticado con sus actividades cargadas
-
-        //ORIGINAL
-        //$user = User::with(['activities.trainer'])->find(Auth::id());
-
-        //AÑADO ESTO.. PARA PROBAR.
-        $user = User::with(['activities' => function ($query) {
-            $query->withPivot('id', 'reservation_date'); // Cargar los datos de la tabla pivote
-        }, 'activities.trainer'])->find(Auth::id());
-
-
-        if (!$user) {
-            return redirect()->route('login');
-        }
-
-        // Meto en cada reserva los datos pivot
-        $reservations = $user->activities;
-
-        // Agregamos esto para depuración que me está dando fallo. 
-        foreach ($reservations as $reservation) {
-            Log::info('Reservation: activity_id=' . $reservation->id . ', pivot_id=' . ($reservation->pivot->id ?? 'null'));
-        }
-
-        return view('users.reservation', compact('reservations'));
-    }
-
-
-
-    public function cancelReservation($reservationId)
-    {
-        // Verificar si el usuario está autenticado
-        if (!Auth::check()) {
-            return redirect()->route('login');
-        }
-
-        // Encontrar la reserva en la tabla pivot
-        $reservation = DB::table('activity_user')
-            ->where('id', $reservationId)
-            ->where('user_id', Auth::id()) // Para seguridad, asegurarse de que la reserva pertenece al usuario
-            ->first();
-
-        if (!$reservation) {
-            return redirect()->route('user.reservations')
-                ->with('error', 'La reserva no existe o no tienes permiso para cancelarla.');
-        }
-
-        // Encontrar la información de la actividad para mostrarla en el mensaje de éxito
-        $activity = Activity::find($reservation->activity_id);
-        $activityName = $activity ? $activity->name : 'la actividad';
-
-        // Eliminar la reserva
-        DB::table('activity_user')
-            ->where('id', $reservationId)
-            ->delete();
-
-        return redirect()->route('user.reservations')
-            ->with('success', "Reserva para {$activityName} cancelada correctamente.");
-    }
-
-
-
-    public function adminReservations()
-    {
-        // Obtener todas las reservas a través de la relación entre User y Activity
-        $users = User::with(['activities' => function ($query) {
-            $query->withPivot('id', 'reservation_date');
-            $query->with('trainer'); // Cargar el entrenador de cada actividad
-        }])->get();
-
-        $reservations = collect();
-
-        foreach ($users as $user) {
-            foreach ($user->activities as $activity) {
-                $reservations->push((object)[
-                    'reservation_id' => $activity->pivot->id,
-                    'reservation_date' => $activity->pivot->reservation_date,
-                    'activity_name' => $activity->name,
-                    'schedule' => $activity->schedule,
-                    'user_name' => $user->name,
-                    'user_email' => $user->email,
-                    'trainer_first_name' => optional($activity->trainer)->first_name,
-                    'trainer_last_name' => optional($activity->trainer)->last_name,
-                    'user_id' => $user->id
-                ]);
-            }
-        }
-
-        // Ordenar por fecha de reserva
-        $reservations = $reservations->sortBy('reservation_date');
-
-        return view('users.adminReservation', compact('reservations'));
-    }
-
-
-    public function adminCancelReservation($reservationId)
-    {
-        // Encontrar la reserva en la tabla pivot
-        $reservation = DB::table('activity_user')
-            ->where('id', $reservationId)
-            ->first();
-
-        if (!$reservation) {
-            return redirect()->route('user.admin.reservations')
-                ->with('error', 'La reserva no existe.');
-        }
-
-        // Encontrar la información de la actividad y del usuario
-        $activity = Activity::find($reservation->activity_id);
-        $user = User::find($reservation->user_id);
-
-        $activityName = $activity ? $activity->name : 'la actividad';
-        $userName = $user ? $user->name : 'el usuario';
-
-        // Eliminar la reserva
-        DB::table('activity_user')
-            ->where('id', $reservationId)
-            ->delete();
-
-        return redirect()->route('user.admin.reservations')
-            ->with('success', "Reserva de {$activityName} para {$userName} cancelada correctamente.");
     }
 }

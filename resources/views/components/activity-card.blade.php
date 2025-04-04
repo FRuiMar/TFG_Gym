@@ -9,27 +9,47 @@
             </div>
         @endif
 
-        <h3 class="text-lg text-gray-800 font-bold">{{ $activity->name }}</h3>
-        <p class="mt-2 text-sm text-gray-600"><strong>Horario:</strong> {{ $activity->schedule }}</p>
-        <p class="text-sm text-gray-600"><strong>Capacidad:</strong> {{ $activity->max_capacity }} personas</p>
+        <h3 class="text-lg text-gray-800 font-bold">{{ $activity->nombre }}</h3>
 
-        @if ($activity->trainer)
+        <p class="mt-2 text-sm text-gray-600"><strong>Duración:</strong> {{ $activity->duracion_minutos }} minutos</p>
+        <p class="text-sm text-gray-600"><strong>Dificultad:</strong> {{ $activity->nivel_dificultad }}</p>
+
+        @if ($activity->classSessions && $activity->classSessions->count() > 0)
+            <p class="text-sm text-gray-600 mt-2"><strong>Horarios disponibles:</strong></p>
+            <ul class="text-xs text-gray-600 mt-1">
+                @foreach ($activity->classSessions->take(3) as $session)
+                    <li>
+                        {{ $session->dia_semana }}: {{ \Carbon\Carbon::parse($session->hora_inicio)->format('H:i') }} -
+                        {{ \Carbon\Carbon::parse($session->hora_fin)->format('H:i') }} ({{ $session->sala }})
+                    </li>
+                @endforeach
+                @if ($activity->classSessions->count() > 3)
+                    <li>... y más horarios</li>
+                @endif
+            </ul>
+        @endif
+
+        @if ($activity->classSessions && $activity->classSessions->count() > 0)
             <p class="mt-2 text-sm text-gray-600">
-                <strong>Entrenador:</strong> {{ $activity->trainer->first_name }} {{ $activity->trainer->last_name }}
+                <strong>Entrenadores:</strong>
+                @php
+                    $trainers = $activity->classSessions->pluck('trainer')->unique('id');
+                @endphp
+                @foreach ($trainers as $trainer)
+                    {{ $trainer->nombre ?? '' }} {{ $trainer->apellido1 ?? '' }}@if (!$loop->last)
+                        ,
+                    @endif
+                @endforeach
             </p>
         @endif
 
         <!-- Botón condicional según estado de autenticación -->
         @if ($showReservationButton)
             @auth
-                <form method="POST" action="{{ route('reservations.store') }}" class="mt-4">
-                    @csrf
-                    <input type="hidden" name="activity_id" value="{{ $activity->id }}">
-                    <button type="submit"
-                        class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-200">
-                        Reservar
-                    </button>
-                </form>
+                <a href="{{ route('activities.show', $activity->id) }}"
+                    class="mt-4 block text-center w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-200">
+                    Ver sesiones
+                </a>
             @else
                 <a href="{{ route('login') }}"
                     class="mt-4 block text-center w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-200">

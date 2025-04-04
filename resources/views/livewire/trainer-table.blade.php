@@ -39,7 +39,7 @@
                     class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                     <option value="">Todas las especialidades</option>
                     @foreach ($specialties as $specialty)
-                        <option value="{{ $specialty }}">{{ $specialty }}</option>
+                        <option value="{{ $specialty->id }}">{{ $specialty->nombre }}</option>
                     @endforeach
                 </select>
             </div>
@@ -68,9 +68,29 @@
                     </th>
                     <th scope="col"
                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
-                        wire:click="sortBy('first_name')">
-                        Nombre Completo
-                        @if ($sortField === 'first_name')
+                        wire:click="sortBy('name')">
+                        Nombre
+                        @if ($sortField === 'name')
+                            @if ($sortDirection === 'asc')
+                                <svg class="inline-block w-4 h-4 ml-1" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 15l7-7 7 7"></path>
+                                </svg>
+                            @else
+                                <svg class="inline-block w-4 h-4 ml-1" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            @endif
+                        @endif
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
+                        wire:click="sortBy('surname')">
+                        Apellidos
+                        @if ($sortField === 'surname')
                             @if ($sortDirection === 'asc')
                                 <svg class="inline-block w-4 h-4 ml-1" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -109,7 +129,7 @@
                     <th scope="col"
                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
                         wire:click="sortBy('specialty')">
-                        Especialidad
+                        Especialidades
                         @if ($sortField === 'specialty')
                             @if ($sortDirection === 'asc')
                                 <svg class="inline-block w-4 h-4 ml-1" fill="none" stroke="currentColor"
@@ -141,12 +161,12 @@
                                     @if ($trainer->image)
                                         <img class="h-10 w-10 rounded-full object-cover"
                                             src="{{ asset('storage/' . $trainer->image) }}"
-                                            alt="{{ $trainer->first_name }} {{ $trainer->last_name }}">
+                                            alt="{{ $trainer->name }} {{ $trainer->surname }}">
                                     @else
                                         <div
                                             class="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
                                             <span
-                                                class="text-gray-500 dark:text-gray-400 font-bold">{{ substr($trainer->first_name, 0, 1) }}</span>
+                                                class="text-gray-500 dark:text-gray-400 font-bold">{{ substr($trainer->name, 0, 1) }}</span>
                                         </div>
                                     @endif
                                 </div>
@@ -154,7 +174,12 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm font-medium text-gray-900 dark:text-white">
-                                {{ $trainer->first_name }} {{ $trainer->last_name }}
+                                {{ $trainer->name }}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                {{ $trainer->surname }} {{ $trainer->surname2 }}
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -165,7 +190,20 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span
                                 class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-700 dark:text-blue-100">
-                                {{ $trainer->specialty }}
+                                @if ($trainer->specialty1)
+                                    {{ $trainer->specialty1->nombre }}
+                                @endif
+
+                                @if ($trainer->specialty2)
+                                    @if ($trainer->specialty1)
+                                        y
+                                    @endif
+                                    {{ $trainer->specialty2->nombre }}
+                                @endif
+
+                                @if (!$trainer->specialty1 && !$trainer->specialty2)
+                                    Sin especialidad
+                                @endif
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -262,8 +300,8 @@
                                 </h3>
                                 <div class="mt-2">
                                     <p class="text-sm text-gray-500 dark:text-gray-400">
-                                        ¿Estás seguro que deseas eliminar a {{ $trainerToDelete->first_name ?? '' }}
-                                        {{ $trainerToDelete->last_name ?? '' }}? Esta acción no se puede deshacer.
+                                        ¿Estás seguro que deseas eliminar a {{ $trainerToDelete->name ?? '' }}
+                                        {{ $trainerToDelete->surname ?? '' }}? Esta acción no se puede deshacer.
                                     </p>
                                 </div>
                             </div>

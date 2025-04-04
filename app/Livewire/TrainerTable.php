@@ -2,7 +2,8 @@
 
 namespace App\Livewire;
 
-use App\Models\Trainer;
+use App\Models\User;
+use App\Models\Activity;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Storage;
@@ -15,7 +16,7 @@ class TrainerTable extends Component
 
     // Propiedades para filtrado, ordenación y paginación
     public $search = '';
-    public $sortField = 'first_name';
+    public $sortField = 'name';
     public $sortDirection = 'asc';
     public $perPage = 10;
     public $filterSpecialty = '';
@@ -28,7 +29,7 @@ class TrainerTable extends Component
     // Configure los parámetros para la URL
     protected $queryString = [
         'search' => ['except' => ''],
-        'sortField' => ['except' => 'first_name'],
+        'sortField' => ['except' => 'name'],
         'sortDirection' => ['except' => 'asc'],
         'filterSpecialty' => ['except' => ''],
         'perPage' => ['except' => 10],
@@ -65,7 +66,7 @@ class TrainerTable extends Component
     public function confirmTrainerDeletion($trainerId)
     {
         $this->trainerIdToDelete = $trainerId;
-        $this->trainerToDelete = Trainer::find($trainerId);
+        $this->trainerToDelete = User::find($trainerId);
         $this->showDeleteModal = true;
     }
 
@@ -85,35 +86,43 @@ class TrainerTable extends Component
         $this->reset(['showDeleteModal', 'trainerIdToDelete', 'trainerToDelete']);
 
         try {
-            $trainer = Trainer::find($trainerId);
+            $trainer = User::find($trainerId);
 
-            if (!$trainer) {
+            if (!$trainer || $trainer->role !== 'TRAINER') {
                 return redirect()->route('trainers.index')->with('error', 'El entrenador no existe.');
             }
 
-            // Verificar si el entrenador tiene actividades asignadas
-            $activitiesCount = $trainer->activities()->count();
+            // Verificar si el entrenador tiene clases asignadas
+            $classesCount = $trainer->classSessions()->count();
 
-            if ($activitiesCount > 0) {
+            if ($classesCount > 0) {
                 // Buscar otro entrenador disponible (idealmente con la misma especialidad)
-                $replacementTrainer = Trainer::where('id', '!=', $trainerId)
-                    ->where('specialty', $trainer->specialty)
+                $replacementTrainer = User::where('id', '!=', $trainerId)
+                    ->where('role', 'TRAINER')
+                    ->where(function ($query) use ($trainer) {
+                        $query->where('specialty_1_id', $trainer->specialty_1_id)
+                            ->orWhere('specialty_2_id', $trainer->specialty_1_id)
+                            ->orWhere('specialty_1_id', $trainer->specialty_2_id)
+                            ->orWhere('specialty_2_id', $trainer->specialty_2_id);
+                    })
                     ->first();
 
                 // Si no hay entrenador con la misma especialidad, buscar cualquier otro
                 if (!$replacementTrainer) {
-                    $replacementTrainer = Trainer::where('id', '!=', $trainerId)->first();
+                    $replacementTrainer = User::where('id', '!=', $trainerId)
+                        ->where('role', 'TRAINER')
+                        ->first();
                 }
 
                 // Si no hay ningún otro entrenador, no permitir la eliminación
                 if (!$replacementTrainer) {
-                    return redirect()->route('trainers.index')->with('error', 'No se puede eliminar el único entrenador disponible. Necesitas al menos otro entrenador para reasignar las actividades.');
+                    return redirect()->route('trainers.index')->with('error', 'No se puede eliminar el único entrenador disponible. Necesitas al menos otro entrenador para reasignar las clases.');
                 }
 
-                // Reasignar todas las actividades al nuevo entrenador
-                $trainer->activities()->update(['trainer_id' => $replacementTrainer->id]);
+                // Reasignar todas las clases al nuevo entrenador
+                $trainer->classSessions()->update(['trainer_id' => $replacementTrainer->id]);
 
-                $message = "Entrenador eliminado con éxito. Se han reasignado {$activitiesCount} actividades al entrenador {$replacementTrainer->first_name} {$replacementTrainer->last_name}.";
+                $message = "Entrenador eliminado con éxito. Se han reasignado {$classesCount} clases al entrenador {$replacementTrainer->name} {$replacementTrainer->surname} {$replacementTrainer->surname2}.";
             } else {
                 $message = 'Entrenador eliminado con éxito.';
             }
@@ -129,56 +138,54 @@ class TrainerTable extends Component
             return redirect()->route('trainers.index')->with('success', $message);
         } catch (\Exception $e) {
             Log::error('Error al eliminar entrenador: ' . $e->getMessage());
-            return redirect()->route('trainers.index')->with('error', 'Ha ocurrido un error al eliminar el entrenador.');
-        }
-    }
-    // Función para eliminar entrenador
-    public function deleteTrainer($trainerId)
-    {
-        $trainer = Trainer::find($trainerId);
-
-        if ($trainer) {
-            // Verificar si el entrenador tiene actividades asignadas
-            if ($trainer->activities()->count() > 0) {
-                session()->flash('error', 'No se puede eliminar el entrenador porque tiene actividades asociadas.');
-                return;
-            }
-
-            // Eliminar la imagen si existe
-            if ($trainer->image && Storage::disk('public')->exists($trainer->image)) {
-                Storage::disk('public')->delete($trainer->image);
-            }
-
-            $trainer->delete();
-
-            session()->flash('success', 'Entrenador eliminado con éxito.');
+            return redirect()->route('trainers.index')->with('error', 'Ha ocurrido un error al eliminar el entrenador: ' . $e->getMessage());
         }
     }
 
     // Método principal para renderizar el componente
     public function render()
     {
-        // Obtener las especialidades únicas para el filtro
-        $specialties = Trainer::select('specialty')->distinct()->pluck('specialty');
+        // Obtener las actividades para el filtro de especialidades
+        $specialties = Activity::orderBy('nombre')->get();
 
-        // Consulta con filtros y ordenamiento
-        $trainers = Trainer::when($this->search, function ($query) {
-            $query->where(function ($q) {
-                $q->where('first_name', 'like', '%' . $this->search . '%')
-                    ->orWhere('last_name', 'like', '%' . $this->search . '%')
-                    ->orWhere('dni', 'like', '%' . $this->search . '%')
-                    ->orWhere('specialty', 'like', '%' . $this->search . '%');
-            });
-        })
-            ->when($this->filterSpecialty, function ($query) {
-                $query->where('specialty', $this->filterSpecialty);
+        // Consulta base
+        $query = User::with(['specialty1', 'specialty2'])
+            ->where('role', 'TRAINER')
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('name', 'like', '%' . $this->search . '%')
+                        ->orWhere('surname', 'like', '%' . $this->search . '%')
+                        ->orWhere('surname2', 'like', '%' . $this->search . '%')
+                        ->orWhere('email', 'like', '%' . $this->search . '%')
+                        ->orWhere('dni', 'like', '%' . $this->search . '%');
+                });
             })
-            ->orderBy($this->sortField, $this->sortDirection)
-            ->paginate($this->perPage);
+            ->when($this->filterSpecialty, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('specialty_1_id', $this->filterSpecialty)
+                        ->orWhere('specialty_2_id', $this->filterSpecialty);
+                });
+            });
+
+        // Ordenación especial por apellidos (considera ambos)
+        if ($this->sortField === 'surname') {
+            $query->orderBy('surname', $this->sortDirection)
+                ->orderBy('surname2', $this->sortDirection);
+        } else {
+            $query->orderBy($this->sortField, $this->sortDirection);
+        }
+
+        $trainers = $query->paginate($this->perPage);
 
         return view('livewire.trainer-table', [
             'trainers' => $trainers,
             'specialties' => $specialties
         ]);
+    }
+
+    // Método para contar las clases de un entrenador
+    public function getClassCount($trainerId)
+    {
+        return User::find($trainerId)->classSessions()->count();
     }
 }

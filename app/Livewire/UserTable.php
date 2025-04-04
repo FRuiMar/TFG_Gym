@@ -146,6 +146,7 @@ class UserTable extends Component
     public function render()
     {
         $users = User::with('membership')
+            ->where('role', '!=', 'TRAINER') // Excluyo a los entrenadores que los voy a poner en una vista a parte
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('name', 'like', '%' . $this->search . '%')

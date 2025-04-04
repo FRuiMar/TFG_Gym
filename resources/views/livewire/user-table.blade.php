@@ -58,8 +58,8 @@
                     <select wire:model.live="filterRole"
                         class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md shadow-sm">
                         <option value="">Todos los roles</option>
-                        <option value="ADMIN">Admin</option>
-                        <option value="NORMAL">Normal</option>
+                        <option value="ADMIN">Administradores</option>
+                        <option value="NORMAL">Usuarios</option>
                     </select>
                 </div>
 
@@ -264,7 +264,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
                                     </svg>
-                                    {{ $user->membership->type }}
+                                    {{ $user->membership->name }}
                                 </span>
                             @else
                                 <span

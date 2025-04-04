@@ -28,8 +28,8 @@ return new class extends Migration
             $table->string('phone', 15)->nullable(); // Teléfono de contacto
             $table->string('emergency_contact', 100)->nullable(); // Contacto de emergencia
             $table->text('health_conditions')->nullable(); // Condiciones médicas relevantes
-            $table->string('specialty_1', 50)->nullable(); // Especialidad principal como texto
-            $table->string('specialty_2', 50)->nullable(); // Especialidad secundaria como texto 
+            $table->foreignId('specialty_1_id')->nullable()->constrained('activities')->onDelete('set null');
+            $table->foreignId('specialty_2_id')->nullable()->constrained('activities')->onDelete('set null');
             $table->boolean('notifications_enabled')->default(true); // Preferencia de recibir notificaciones
             $table->string('image')->nullable(); // Imagen (puede ser nula)
             $table->foreignId('membership_id')->nullable()->constrained('memberships')->onDelete('set null'); // Relación con membresías

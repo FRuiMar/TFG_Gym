@@ -43,8 +43,8 @@ class UserFactory extends Factory
             'phone' => $this->faker->optional(0.9)->numerify('6########'),
             'emergency_contact' => $this->faker->optional(0.6)->name() . ': ' . $this->faker->numerify('6########'),
             'health_conditions' => $this->faker->optional(0.3)->sentence(),
-            'specialty_1' => null, // Usuarios normales no tienen especialidad
-            'specialty_2' => null, // Usuarios normales no tienen especialidad
+            'specialty_1_id' => null, // Usuarios normales no tienen especialidad
+            'specialty_2_id' => null, // Usuarios normales no tienen especialidad
             'notifications_enabled' => $this->faker->boolean(80), // 80% tienen notificaciones activadas
             'image' => null,
             'membership_id' => function () {

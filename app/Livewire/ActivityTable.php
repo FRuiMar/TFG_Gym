@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Activity;
-use App\Models\Trainer;
+use App\Models\User;  // Cambiar Trainer por User
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Storage;
@@ -16,7 +16,7 @@ class ActivityTable extends Component
 
     // Propiedades para filtrado, ordenación y paginación
     public $search = '';
-    public $sortField = 'name';
+    public $sortField = 'nombre'; // Cambiado de 'name' a 'nombre' para coincidir con la BD
     public $sortDirection = 'asc';
     public $perPage = 10;
     public $filterTrainer = '';
@@ -29,7 +29,7 @@ class ActivityTable extends Component
     // Configure los parámetros para la URL
     protected $queryString = [
         'search' => ['except' => ''],
-        'sortField' => ['except' => 'name'],
+        'sortField' => ['except' => 'nombre'],  // Actualizado
         'sortDirection' => ['except' => 'asc'],
         'filterTrainer' => ['except' => ''],
         'perPage' => ['except' => 10],
@@ -92,20 +92,37 @@ class ActivityTable extends Component
                 return redirect()->route('activities.index')->with('error', 'La actividad no existe.');
             }
 
-            // Contar cuántos usuarios están inscritos en esta actividad
-            $userCount = $activity->users()->count();
+            // Verificar si hay entrenadores que tengan esta actividad como especialidad
+            $trainersCount = User::where('role', 'TRAINER')
+                ->where(function ($query) use ($activityId) {
+                    $query->where('specialty_1_id', $activityId)
+                        ->orWhere('specialty_2_id', $activityId);
+                })->count();
+
+            if ($trainersCount > 0) {
+                return redirect()->route('activities.index')->with('error', 'No se puede eliminar esta actividad porque hay entrenadores que la tienen como especialidad.');
+            }
+
+            // Contar cuántos usuarios están inscritos a sesiones de esta actividad
+            $sessionsWithUsers = $activity->classSessions()->withCount('users')->get();
+            $userCount = $sessionsWithUsers->sum('users_count');
 
             if ($userCount > 0) {
-                // Eliminar todas las reservas (registros pivot) para esta actividad
-                $activity->users()->detach();
+                // Eliminar todas las reservas (registros pivot) para sesiones de esta actividad
+                foreach ($activity->classSessions as $session) {
+                    $session->users()->detach();
+                }
                 $message = "Actividad eliminada con éxito. Se han cancelado $userCount reservas asociadas.";
             } else {
                 $message = 'Actividad eliminada con éxito.';
             }
 
+            // Eliminar las sesiones de clase asociadas
+            $activity->classSessions()->delete();
+
             // Eliminar la imagen si existe
-            if ($activity->image && Storage::disk('public')->exists($activity->image)) {
-                Storage::disk('public')->delete($activity->image);
+            if ($activity->imagen && Storage::disk('public')->exists($activity->imagen)) {
+                Storage::disk('public')->delete($activity->imagen);
             }
 
             // Eliminar la actividad
@@ -114,30 +131,7 @@ class ActivityTable extends Component
             return redirect()->route('activities.index')->with('success', $message);
         } catch (\Exception $e) {
             Log::error('Error al eliminar actividad: ' . $e->getMessage());
-            return redirect()->route('activities.index')->with('error', 'Ha ocurrido un error al eliminar la actividad.');
-        }
-    }
-
-    // Función para eliminar actividad
-    public function deleteActivity($activityId)
-    {
-        $activity = Activity::find($activityId);
-
-        if ($activity) {
-            // Verificar si la actividad tiene usuarios inscritos
-            if ($activity->users()->count() > 0) {
-                session()->flash('error', 'No se puede eliminar la actividad porque hay usuarios inscritos.');
-                return;
-            }
-
-            // Eliminar la imagen si existe
-            if ($activity->image && Storage::disk('public')->exists($activity->image)) {
-                Storage::disk('public')->delete($activity->image);
-            }
-
-            $activity->delete();
-
-            session()->flash('success', 'Actividad eliminada con éxito.');
+            return redirect()->route('activities.index')->with('error', 'Ha ocurrido un error al eliminar la actividad: ' . $e->getMessage());
         }
     }
 
@@ -145,19 +139,24 @@ class ActivityTable extends Component
     public function render()
     {
         // Obtener todos los entrenadores para el filtro
-        $trainers = Trainer::all();
+        $trainers = User::where('role', 'TRAINER')
+            ->orderBy('name')
+            ->orderBy('surname')
+            ->get();
 
         // Consulta con filtros y ordenamiento
-        $activities = Activity::with('trainer')
+        $activities = Activity::with(['classSessions.trainer'])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%')
-                        ->orWhere('description', 'like', '%' . $this->search . '%')
-                        ->orWhere('schedule', 'like', '%' . $this->search . '%');
+                    $q->where('nombre', 'like', '%' . $this->search . '%')
+                        ->orWhere('descripcion', 'like', '%' . $this->search . '%')
+                        ->orWhere('nivel_dificultad', 'like', '%' . $this->search . '%');
                 });
             })
             ->when($this->filterTrainer, function ($query) {
-                $query->where('trainer_id', $this->filterTrainer);
+                $query->whereHas('classSessions', function ($q) {
+                    $q->where('trainer_id', $this->filterTrainer);
+                });
             })
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate($this->perPage);

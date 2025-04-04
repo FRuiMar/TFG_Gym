@@ -21,7 +21,7 @@ class Activity extends Model
     ];
 
     // Relación con sesiones
-    public function sessions()
+    public function classSessions()
     {
         return $this->hasMany(ClassSession::class);
     }
@@ -36,5 +36,13 @@ class Activity extends Model
     public function specialistTrainers2()
     {
         return $this->hasMany(User::class, 'specialty_2_id');
+    }
+
+    // Relación con los usuarios inscritos en esta actividad
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'activity_user', 'activity_id', 'user_id')
+            ->withPivot('reservation_date')
+            ->withTimestamps();
     }
 }

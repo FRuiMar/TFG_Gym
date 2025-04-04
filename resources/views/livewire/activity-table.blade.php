@@ -50,7 +50,9 @@
                         class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 shadow-sm">
                         <option value="">Todos los entrenadores</option>
                         @foreach ($trainers as $trainer)
-                            <option value="{{ $trainer->id }}">{{ $trainer->first_name }} {{ $trainer->last_name }}
+                            <option value="{{ $trainer->id }}">{{ $trainer->name }} {{ $trainer->surname }}
+                                {{ $trainer->surname }}
+                            </option>
                             </option>
                         @endforeach
                     </select>
@@ -83,9 +85,9 @@
                     </th>
                     <th scope="col"
                         class="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
-                        wire:click="sortBy('name')">
+                        wire:click="sortBy('nombre')">
                         Nombre
-                        @if ($sortField === 'name')
+                        @if ($sortField === 'nombre')
                             @if ($sortDirection === 'asc')
                                 <svg class="inline-block w-4 h-4 ml-1 text-blue-600" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -164,7 +166,7 @@
                                         class="h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg border-2 border-gray-200 dark:border-gray-600 shadow-md transition-transform duration-300 hover:scale-110">
                                         <img class="h-full w-full object-cover"
                                             src="{{ asset('storage/' . $activity->image) }}"
-                                            alt="{{ $activity->name }}">
+                                            alt="{{ $activity->nombre }}">
                                     </div>
                                 @else
                                     <div
@@ -181,7 +183,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm font-medium text-gray-900 dark:text-white">
-                                {{ $activity->name }}
+                                {{ $activity->nombre }}
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -207,7 +209,8 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
-                                @if ($activity->trainer)
+                                @if ($activity->classSessions->isNotEmpty() && $activity->classSessions->first()->trainer)
+                                    {{--  pongo first porque el entrenador siempre es el mismo para una actividad, independiente del dia y la hora. si no.. hay que cambiarlo.  --}}
                                     <span
                                         class="px-2 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none"
@@ -215,8 +218,9 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
-                                        {{ $activity->trainer->first_name }}
-                                        {{ $activity->trainer->last_name }}
+                                        {{ $activity->classSessions->first()->trainer->name }}
+                                        {{ $activity->classSessions->first()->trainer->surname }}
+                                        {{ $activity->classSessions->first()->trainer->surname2 }}
                                     </span>
                                 @else
                                     <span
@@ -344,7 +348,7 @@
                                 <div class="mt-2">
                                     <p class="text-sm text-gray-500 dark:text-gray-400">
                                         ¿Estás seguro que deseas eliminar la actividad
-                                        "{{ $activityToDelete->name ?? '' }}"? Esta acción no se puede deshacer.
+                                        "{{ $activityToDelete->nombre ?? '' }}"? Esta acción no se puede deshacer.
                                     </p>
                                 </div>
                             </div>

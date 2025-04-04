@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class ActivityController extends Controller
 {
@@ -16,13 +17,13 @@ class ActivityController extends Controller
      */
     public function index()
     {
-        $activities = Activity::with('trainer')->get();
+        $activities = Activity::with('classSessions.trainer')->get();
         return view('activities.index', compact('activities'));
     }
 
     public function cardsUser()
     {
-        $activities = Activity::with('trainer')->get();
+        $activities = Activity::with('classSessions.trainer')->get();
         return view('activities.cardsUser', compact('activities'));
     }
 
@@ -33,7 +34,7 @@ class ActivityController extends Controller
      */
     public function cards()
     {
-        $activities = Activity::with('trainer')->get();
+        $activities = Activity::with('classSessions.trainer')->get();
         return view('activities.cards', compact('activities'));
     }
 
@@ -42,7 +43,7 @@ class ActivityController extends Controller
      */
     public function create()
     {
-        $trainers = Trainer::all();
+        $trainers = User::where('role', 'TRAINER')->get();
         return view('activities.create', compact('trainers'));
     }
 
@@ -92,7 +93,7 @@ class ActivityController extends Controller
      */
     public function show(Activity $activity)
     {
-        $activity->load('trainer', 'users');
+        $activity->load('classSessions.trainer', 'users');
         return view('activities.show', compact('activity'));
     }
 
@@ -101,7 +102,7 @@ class ActivityController extends Controller
      */
     public function edit(Activity $activity)
     {
-        $trainers = Trainer::all();
+        $trainers = User::where('role', 'TRAINER')->get();
         return view('activities.edit', compact('activity', 'trainers'));
     }
 
@@ -174,13 +175,15 @@ class ActivityController extends Controller
     }
 
 
+
+    //le creo una función welcome() para la vista de bienvenida
     public function welcome()
     {
         if (Auth::check()) {
             return redirect()->route('dashboard');
         }
 
-        $activities = Activity::with('trainer')->get();
+        $activities = Activity::with('classSessions.trainer')->get();
         return view('welcome', compact('activities'));
     }
 }

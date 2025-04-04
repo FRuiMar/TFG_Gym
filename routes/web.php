@@ -10,6 +10,7 @@ use App\Http\Controllers\TrainerController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\ReservationController;
+use App\Models\Activity;
 
 
 
@@ -33,7 +34,21 @@ use App\Http\Controllers\ReservationController;
 //     return view('welcome', ['activities' => $activities]);
 // });
 
-Route::get('/', [ActivityController::class, 'welcome']);
+
+//TEMPORALMENTE LO SUSTITUYO.. REVISAR LUEGO
+//Route::get('/', [ActivityController::class, 'welcome']);
+
+Route::get('/', function () {
+    // Cargar actividades para la página de bienvenida usando la nueva estructura
+    $activities = Activity::with('classSessions.trainer')->get();
+
+    // Añadir debug (opcional)
+    //\Illuminate\Support\Facades\Log::info('Welcome: Actividades cargadas: ' . count($activities));
+
+    return view('welcome', compact('activities'));
+})->name('welcome');
+
+
 
 
 Route::get('/dashboard', function () {
@@ -63,17 +78,17 @@ Route::middleware('auth')->group(function () {
         Route::get('/user-activities', [ActivityController::class, 'cardsUser'])
             ->name('activities.user-cards');
 
-        // Ruta para crear reservas
+        //Ruta para crear reservas
         Route::post('/reservations', [ReservationController::class, 'store'])
             ->name('reservations.store');;
 
-        Route::get('/mis-reservas', [UserController::class, 'myReservations'])->name('user.reservations');
-        Route::delete('/mis-reservas/cancel/{reservationId}', [UserController::class, 'cancelReservation'])
+        Route::get('/mis-reservas', [ReservationController::class, 'myReservations'])->name('user.reservations');
+        Route::delete('/mis-reservas/cancel/{reservationId}', [ReservationController::class, 'cancelReservation'])
             ->name('user.reservations.cancel');
 
 
-        // // Ruta para ver membresías disponibles (como tarjetas)
-        // Route::get('/memberships-available', [MembershipController::class, 'indexUser'])->name('memberships.available');
+        // Ruta para ver membresías disponibles (como tarjetas)
+        Route::get('/memberships-available', [MembershipController::class, 'indexUser'])->name('memberships.available');
     });
 
 

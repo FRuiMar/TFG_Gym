@@ -26,8 +26,8 @@ class UserSeeder extends Seeder
             'phone' => '600111222',
             'emergency_contact' => null,
             'health_conditions' => null,
-            'specialty_1' => null,
-            'specialty_2' => null,
+            'specialty_1_id' => null,
+            'specialty_2_id' => null,
             'notifications_enabled' => true,
             'image' => null,
             'membership_id' => null,
@@ -51,8 +51,8 @@ class UserSeeder extends Seeder
             'phone' => '600333444',
             'emergency_contact' => 'Familiar: 600555666',
             'health_conditions' => 'Ninguna',
-            'specialty_1' => null,
-            'specialty_2' => null,
+            'specialty_1_id' => null,
+            'specialty_2_id' => null,
             'notifications_enabled' => true,
             'image' => null,
             'membership_id' => 1, // ID de una membresía básica
@@ -81,8 +81,8 @@ class UserSeeder extends Seeder
             'phone' => '600123456',
             'emergency_contact' => 'Familiar: 600789012',
             'health_conditions' => null,
-            'specialty_1' => 'Zumba',
-            'specialty_2' => 'Merengue',
+            'specialty_1_id' => 1, //Zumba
+            'specialty_2_id' => 7, //Boxeo
             'notifications_enabled' => true,
             'image' => null,
             'membership_id' => null,
@@ -105,8 +105,8 @@ class UserSeeder extends Seeder
             'phone' => '600234567',
             'emergency_contact' => null,
             'health_conditions' => null,
-            'specialty_1' => 'PowerGym',
-            'specialty_2' => 'Crossfit',
+            'specialty_1_id' => 3, //Crossfit
+            'specialty_2_id' => 6, //Spinning
             'notifications_enabled' => true,
             'image' => null,
             'membership_id' => null,
@@ -129,8 +129,8 @@ class UserSeeder extends Seeder
             'phone' => '600345678',
             'emergency_contact' => null,
             'health_conditions' => null,
-            'specialty_1' => 'Salsa',
-            'specialty_2' => 'Yoga',
+            'specialty_1_id' => 2, //Yoga
+            'specialty_2_id' => 8, //Salsa
             'notifications_enabled' => true,
             'image' => null,
             'membership_id' => null,
@@ -153,8 +153,8 @@ class UserSeeder extends Seeder
             'phone' => '600456789',
             'emergency_contact' => null,
             'health_conditions' => null,
-            'specialty_1' => 'Step',
-            'specialty_2' => 'HIIT',
+            'specialty_1_id' => 4, //HIIT
+            'specialty_2_id' => 5, //Pilates
             'notifications_enabled' => true,
             'image' => null,
             'membership_id' => null,

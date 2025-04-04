@@ -8,6 +8,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Activity;
+use App\Models\ClassSession;
 use App\Models\Membership;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -33,15 +34,15 @@ class User extends Authenticatable implements MustVerifyEmail
         'phone',
         'emergency_contact',
         'health_conditions',
-        'specialty_1',
-        'specialty_2',
+        'specialty_1_id',
+        'specialty_2_id',
         'notifications_enabled',
         'image',
         'membership_id',
         'active',
     ];
 
-    // Campos ocultos (no se incluyen en las respuestas JSON)
+    // Campos ocultos (no los incluyo en las respuestas JSON)
     protected $hidden = [
         'password',
         'remember_token',
@@ -56,15 +57,15 @@ class User extends Authenticatable implements MustVerifyEmail
 
 
     // Historial de membresías
-    public function membershipHistory()
+    public function userMemberships()
     {
         return $this->hasMany(UserMembership::class);
     }
 
     // Relación con Membership actual para mayor claridad
-    public function currentMembership()
+    public function membership()
     {
-        return $this->belongsTo(Membership::class, 'membership_id');
+        return $this->belongsTo(Membership::class);
     }
 
     // Rutinas del usuario
@@ -86,7 +87,7 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     // Sesiones que imparte (para entrenadores)
-    public function trainingSessions()
+    public function classSessions()
     {
         return $this->hasMany(ClassSession::class, 'trainer_id');
     }
@@ -96,4 +97,16 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'birth_date' => 'date',
     ];
+
+
+    //Relación  con especialidades
+    public function specialty1()
+    {
+        return $this->belongsTo(Activity::class, 'specialty_1_id');
+    }
+
+    public function specialty2()
+    {
+        return $this->belongsTo(Activity::class, 'specialty_2_id');
+    }
 }
