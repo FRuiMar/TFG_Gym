@@ -3,7 +3,8 @@
 namespace App\Livewire;
 
 use App\Models\Activity;
-use App\Models\User;  // Cambiar Trainer por User
+use App\Models\ClassSession;
+use App\Models\User;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Storage;
@@ -16,20 +17,28 @@ class ActivityTable extends Component
 
     // Propiedades para filtrado, ordenación y paginación
     public $search = '';
-    public $sortField = 'nombre'; // Cambiado de 'name' a 'nombre' para coincidir con la BD
+    public $sortField = 'nombre';
     public $sortDirection = 'asc';
     public $perPage = 10;
     public $filterTrainer = '';
 
-    // Propiedades para el modal de confirmación
+    // Para expandir filas
+    public $expandedRows = [];
+
+    // Propiedades para el modal de confirmación de actividad
     public $showDeleteModal = false;
     public $activityIdToDelete = null;
     public $activityToDelete = null;
 
+    // Propiedades para el modal de confirmación de sesión
+    public $showSessionDeleteModal = false;
+    public $sessionIdToDelete = null;
+    public $sessionToDelete = null;
+
     // Configure los parámetros para la URL
     protected $queryString = [
         'search' => ['except' => ''],
-        'sortField' => ['except' => 'nombre'],  // Actualizado
+        'sortField' => ['except' => 'nombre'],
         'sortDirection' => ['except' => 'asc'],
         'filterTrainer' => ['except' => ''],
         'perPage' => ['except' => 10],
@@ -51,6 +60,16 @@ class ActivityTable extends Component
         $this->resetPage();
     }
 
+    // Método para expandir/colapsar filas
+    public function toggleExpand($activityId)
+    {
+        if (isset($this->expandedRows[$activityId])) {
+            $this->expandedRows[$activityId] = !$this->expandedRows[$activityId];
+        } else {
+            $this->expandedRows[$activityId] = true;
+        }
+    }
+
     // Método para ordenar por campo
     public function sortBy($field)
     {
@@ -62,7 +81,7 @@ class ActivityTable extends Component
         }
     }
 
-    // Método para mostrar el modal de confirmación
+    // Método para mostrar el modal de confirmación de actividad
     public function confirmActivityDeletion($activityId)
     {
         $this->activityIdToDelete = $activityId;
@@ -70,13 +89,60 @@ class ActivityTable extends Component
         $this->showDeleteModal = true;
     }
 
-    // Método para cerrar el modal sin eliminar
+    // Método para cerrar el modal sin eliminar actividad
     public function cancelActivityDeletion()
     {
         $this->reset(['showDeleteModal', 'activityIdToDelete', 'activityToDelete']);
     }
 
-    // Método para confirmar la eliminación
+    // Método para mostrar el modal de confirmación de sesión
+    public function confirmSessionDeletion($sessionId)
+    {
+        $this->sessionIdToDelete = $sessionId;
+        $this->sessionToDelete = ClassSession::find($sessionId);
+        $this->showSessionDeleteModal = true;
+    }
+
+    // Método para cerrar el modal sin eliminar sesión
+    public function cancelSessionDeletion()
+    {
+        $this->reset(['showSessionDeleteModal', 'sessionIdToDelete', 'sessionToDelete']);
+    }
+
+    // Método para eliminar una sesión
+    public function deleteSession()
+    {
+        try {
+            $session = ClassSession::find($this->sessionIdToDelete);
+
+            if (!$session) {
+                session()->flash('error', 'La sesión no existe.');
+                $this->reset(['showSessionDeleteModal', 'sessionIdToDelete', 'sessionToDelete']);
+                return;
+            }
+
+            // Verificar si hay usuarios inscritos
+            $usersCount = $session->users()->count();
+
+            if ($usersCount > 0) {
+                // Eliminar inscripciones
+                $session->users()->detach();
+                $message = "Sesión eliminada. Se han cancelado $usersCount inscripciones.";
+            } else {
+                $message = "Sesión eliminada correctamente.";
+            }
+
+            $session->delete();
+            session()->flash('success', $message);
+        } catch (\Exception $e) {
+            Log::error('Error al eliminar sesión: ' . $e->getMessage());
+            session()->flash('error', 'Ha ocurrido un error al eliminar la sesión.');
+        }
+
+        $this->reset(['showSessionDeleteModal', 'sessionIdToDelete', 'sessionToDelete']);
+    }
+
+    // Método para confirmar la eliminación de actividad
     public function deleteConfirmed()
     {
         // Guarda el ID antes de resetear el modal
@@ -89,7 +155,8 @@ class ActivityTable extends Component
             $activity = Activity::find($activityId);
 
             if (!$activity) {
-                return redirect()->route('activities.index')->with('error', 'La actividad no existe.');
+                session()->flash('error', 'La actividad no existe.');
+                return;
             }
 
             // Verificar si hay entrenadores que tengan esta actividad como especialidad
@@ -100,21 +167,18 @@ class ActivityTable extends Component
                 })->count();
 
             if ($trainersCount > 0) {
-                return redirect()->route('activities.index')->with('error', 'No se puede eliminar esta actividad porque hay entrenadores que la tienen como especialidad.');
+                session()->flash('error', 'No se puede eliminar esta actividad porque hay entrenadores que la tienen como especialidad.');
+                return;
             }
 
-            // Contar cuántos usuarios están inscritos a sesiones de esta actividad
-            $sessionsWithUsers = $activity->classSessions()->withCount('users')->get();
-            $userCount = $sessionsWithUsers->sum('users_count');
+            // Contar sesiones y usuarios inscritos
+            $sessionsCount = $activity->classSessions()->count();
+            $usersInSessions = 0;
 
-            if ($userCount > 0) {
-                // Eliminar todas las reservas (registros pivot) para sesiones de esta actividad
-                foreach ($activity->classSessions as $session) {
-                    $session->users()->detach();
-                }
-                $message = "Actividad eliminada con éxito. Se han cancelado $userCount reservas asociadas.";
-            } else {
-                $message = 'Actividad eliminada con éxito.';
+            foreach ($activity->classSessions as $session) {
+                $usersInSessions += $session->users()->count();
+                // Eliminar relaciones de usuarios con sesiones
+                $session->users()->detach();
             }
 
             // Eliminar las sesiones de clase asociadas
@@ -128,10 +192,20 @@ class ActivityTable extends Component
             // Eliminar la actividad
             $activity->delete();
 
-            return redirect()->route('activities.index')->with('success', $message);
+            $message = "Actividad eliminada con éxito.";
+            if ($sessionsCount > 0) {
+                $message .= " Se han eliminado $sessionsCount sesiones";
+                if ($usersInSessions > 0) {
+                    $message .= " y $usersInSessions reservas de usuarios.";
+                } else {
+                    $message .= ".";
+                }
+            }
+
+            session()->flash('success', $message);
         } catch (\Exception $e) {
             Log::error('Error al eliminar actividad: ' . $e->getMessage());
-            return redirect()->route('activities.index')->with('error', 'Ha ocurrido un error al eliminar la actividad: ' . $e->getMessage());
+            session()->flash('error', 'Ha ocurrido un error al eliminar la actividad: ' . $e->getMessage());
         }
     }
 

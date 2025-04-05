@@ -10,7 +10,9 @@ use App\Http\Controllers\TrainerController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\ClassSessionController;
 use App\Models\Activity;
+
 
 
 
@@ -104,6 +106,21 @@ Route::middleware('auth')->group(function () {
         Route::get('/activities/{activity}', [ActivityController::class, 'show'])->name('activities.show');
         Route::put('/activities/{activity}', [ActivityController::class, 'update'])->name('activities.update');
         Route::delete('/activities/{activity}', [ActivityController::class, 'destroy'])->name('activities.destroy');
+
+
+        Route::get('/class-sessions/create', [ClassSessionController::class, 'create'])
+            ->name('class-sessions.create');
+        Route::post('/class-sessions', [ClassSessionController::class, 'store'])
+            ->name('class-sessions.store');
+        Route::get('/class-sessions/{classSession}/edit', [ClassSessionController::class, 'edit'])
+            ->name('class-sessions.edit');
+        Route::put('/class-sessions/{classSession}', [ClassSessionController::class, 'update'])
+            ->name('class-sessions.update');
+        Route::delete('/class-sessions/{classSession}', [ClassSessionController::class, 'destroy'])
+            ->name('class-sessions.destroy');
+
+
+
 
         Route::resource('users', UserController::class);
 

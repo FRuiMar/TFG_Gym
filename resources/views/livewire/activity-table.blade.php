@@ -76,9 +76,9 @@
     <!-- Tabla de actividades con estilo mejorado y limpio -->
     <div class="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-md">
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <!-- Cabecera de tabla mejorada -->
             <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
+                    <th scope="col" class="w-12"></th> <!-- Columna para botón expandir -->
                     <th scope="col"
                         class="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                         Imagen
@@ -88,64 +88,56 @@
                         wire:click="sortBy('nombre')">
                         Nombre
                         @if ($sortField === 'nombre')
-                            @if ($sortDirection === 'asc')
-                                <svg class="inline-block w-4 h-4 ml-1 text-blue-600" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 15l7-7 7 7"></path>
-                                </svg>
-                            @else
-                                <svg class="inline-block w-4 h-4 ml-1 text-blue-600" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                            @endif
+                            <!-- Iconos de ordenación -->
                         @endif
                     </th>
                     <th scope="col"
                         class="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
-                        wire:click="sortBy('schedule')">
-                        Horario
-                        @if ($sortField === 'schedule')
-                            @if ($sortDirection === 'asc')
-                                <svg class="inline-block w-4 h-4 ml-1 text-blue-600" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 15l7-7 7 7"></path>
-                                </svg>
-                            @else
-                                <svg class="inline-block w-4 h-4 ml-1 text-blue-600" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                            @endif
+                        wire:click="sortBy('duracion_minutos')">
+                        Duración
+                        @if ($sortField === 'duracion_minutos')
+                            <!-- Iconos de ordenación -->
                         @endif
                     </th>
                     <th scope="col"
                         class="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
-                        wire:click="sortBy('max_capacity')">
-                        Capacidad
-                        @if ($sortField === 'max_capacity')
-                            @if ($sortDirection === 'asc')
-                                <svg class="inline-block w-4 h-4 ml-1 text-blue-600" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 15l7-7 7 7"></path>
-                                </svg>
-                            @else
-                                <svg class="inline-block w-4 h-4 ml-1 text-blue-600" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                            @endif
+                        wire:click="sortBy('nivel_dificultad')">
+                        Nivel
+                        @if ($sortField === 'nivel_dificultad')
+                            <!-- Iconos de ordenación -->
+                        @endif
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
+                        wire:click="sortBy('calories_burned')">
+                        Calorías
+                        @if ($sortField === 'calories_burned')
+                            <!-- Iconos de ordenación -->
                         @endif
                     </th>
                     <th scope="col"
                         class="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                        Entrenador
+                        Sesiones
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
+                        wire:click="sortBy('active')">
+                        Estado
+                        @if ($sortField === 'active')
+                            @if ($sortDirection === 'asc')
+                                <svg class="inline-block w-4 h-4 ml-1" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 15l7-7 7 7"></path>
+                                </svg>
+                            @else
+                                <svg class="inline-block w-4 h-4 ml-1" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            @endif
+                        @endif
                     </th>
                     <th scope="col"
                         class="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wider">
@@ -153,19 +145,40 @@
                     </th>
                 </tr>
             </thead>
-
-            <!-- Cuerpo de tabla con animaciones y hover mejorados -->
             <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
                 @forelse ($activities as $activity)
                     <tr wire:key="activity-{{ $activity->id }}"
                         class="transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <!-- Botón expandir -->
+                        <td class="pl-4">
+                            <button wire:click="toggleExpand({{ $activity->id }})"
+                                class="p-1 text-gray-500 hover:text-blue-600 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/30 focus:outline-none">
+                                @if (isset($expandedRows[$activity->id]) && $expandedRows[$activity->id])
+                                    <svg class="w-5 h-5 transform rotate-90 transition-transform duration-200"
+                                        fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd"
+                                            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                @else
+                                    <svg class="w-5 h-5 transition-transform duration-200" fill="currentColor"
+                                        viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd"
+                                            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                @endif
+                            </button>
+                        </td>
+
+                        <!-- Imagen -->
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center justify-center">
-                                @if ($activity->image)
+                                @if ($activity->imagen)
                                     <div
                                         class="h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg border-2 border-gray-200 dark:border-gray-600 shadow-md transition-transform duration-300 hover:scale-110">
                                         <img class="h-full w-full object-cover"
-                                            src="{{ asset('storage/' . $activity->image) }}"
+                                            src="{{ asset('storage/' . $activity->imagen) }}"
                                             alt="{{ $activity->nombre }}">
                                     </div>
                                 @else
@@ -181,60 +194,82 @@
                                 @endif
                             </div>
                         </td>
+
+                        <!-- Nombre -->
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm font-medium text-gray-900 dark:text-white">
                                 {{ $activity->nombre }}
                             </div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-1"
+                                title="{{ $activity->descripcion }}">
+                                {{ Str::limit($activity->descripcion, 30) }}
+                            </div>
                         </td>
+
+                        <!-- Duración -->
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-600 dark:text-gray-300 flex items-center">
+                            <div class="flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500 mr-1"
                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                {{ $activity->schedule }}
+                                <span
+                                    class="text-sm text-gray-600 dark:text-gray-300">{{ $activity->duracion_minutos }}
+                                    min</span>
                             </div>
                         </td>
+
+                        <!-- Nivel de dificultad -->
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span
+                                class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                {{ $activity->nivel_dificultad === 'principiante' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : '' }}
+                                {{ $activity->nivel_dificultad === 'intermedio' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : '' }}
+                                {{ $activity->nivel_dificultad === 'avanzado' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : '' }}">
+                                {{ ucfirst($activity->nivel_dificultad) }}
+                            </span>
+                        </td>
+
+                        <!-- Calorías -->
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500 mr-1"
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-orange-500 mr-1"
                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        d="M13 10V3L4 14h7v7l9-11h-7z" />
                                 </svg>
                                 <span
-                                    class="text-sm text-gray-600 dark:text-gray-300">{{ $activity->max_capacity }}</span>
+                                    class="text-sm text-gray-600 dark:text-gray-300">{{ $activity->calories_burned ?? '-' }}
+                                    kcal</span>
                             </div>
                         </td>
+
+                        <!-- Contador de sesiones -->
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                @if ($activity->classSessions->isNotEmpty() && $activity->classSessions->first()->trainer)
-                                    {{--  pongo first porque el entrenador siempre es el mismo para una actividad, independiente del dia y la hora. si no.. hay que cambiarlo.  --}}
-                                    <span
-                                        class="px-2 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        {{ $activity->classSessions->first()->trainer->name }}
-                                        {{ $activity->classSessions->first()->trainer->surname }}
-                                        {{ $activity->classSessions->first()->trainer->surname2 }}
-                                    </span>
-                                @else
-                                    <span
-                                        class="px-2 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        Sin asignar
-                                    </span>
-                                @endif
-                            </div>
+                            <span
+                                class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                {{ $activity->classSessions->count() }} sesiones
+                            </span>
                         </td>
+
+                        <!-- Status -->
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @if ($activity->active)
+                                <span
+                                    class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                    Activa
+                                </span>
+                            @else
+                                <span
+                                    class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                                    Inactiva
+                                </span>
+                            @endif
+                        </td>
+
+
+                        <!-- Acciones -->
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex space-x-2">
                                 <a href="{{ route('activities.show', $activity->id) }}"
@@ -269,22 +304,130 @@
                             </div>
                         </td>
                     </tr>
+
+                    <!-- Fila expandible para sesiones -->
+                    @if (isset($expandedRows[$activity->id]) && $expandedRows[$activity->id])
+                        <tr class="bg-gray-50 dark:bg-gray-700/50">
+                            <td colspan="7" class="px-6 py-4">
+                                <div class="border-t border-gray-200 dark:border-gray-700 pt-3">
+                                    <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-2">Sesiones de
+                                        {{ $activity->nombre }}</h3>
+
+                                    @if ($activity->classSessions->isEmpty())
+                                        <p class="text-sm text-gray-500 dark:text-gray-400 py-2">No hay sesiones
+                                            programadas para esta actividad.</p>
+                                    @else
+                                        <div class="overflow-x-auto">
+                                            <table
+                                                class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 rounded-lg overflow-hidden">
+                                                <thead class="bg-gray-100 dark:bg-gray-800">
+                                                    <tr>
+                                                        <th
+                                                            class="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                                                            Día</th>
+                                                        <th
+                                                            class="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                                                            Horario</th>
+                                                        <th
+                                                            class="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                                                            Sala</th>
+                                                        <th
+                                                            class="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                                                            Capacidad</th>
+                                                        <th
+                                                            class="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                                                            Entrenador</th>
+                                                        <th
+                                                            class="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                                                            Acciones</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody
+                                                    class="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-800">
+                                                    @foreach ($activity->classSessions as $session)
+                                                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                                                            <td
+                                                                class="px-3 py-2 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                                                {{ $session->dia_semana }}
+                                                            </td>
+                                                            <td
+                                                                class="px-3 py-2 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                                                {{ \Carbon\Carbon::parse($session->hora_inicio)->format('H:i') }}
+                                                                -
+                                                                {{ \Carbon\Carbon::parse($session->hora_fin)->format('H:i') }}
+                                                            </td>
+                                                            <td
+                                                                class="px-3 py-2 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                                                {{ $session->sala }}
+                                                            </td>
+                                                            <td
+                                                                class="px-3 py-2 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                                                                {{ $session->capacidad_max }}
+                                                            </td>
+                                                            <td class="px-3 py-2 whitespace-nowrap">
+                                                                @if ($session->trainer)
+                                                                    <span
+                                                                        class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                                                        {{ $session->trainer->name }}
+                                                                        {{ $session->trainer->surname }}
+                                                                    </span>
+                                                                @else
+                                                                    <span
+                                                                        class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                                                                        Sin asignar
+                                                                    </span>
+                                                                @endif
+                                                            </td>
+                                                            <td class="px-3 py-2 whitespace-nowrap">
+                                                                <div class="flex space-x-1">
+                                                                    <a href="{{ route('class-sessions.edit', $session->id) }}"
+                                                                        class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 p-1 rounded-full hover:bg-indigo-100 dark:hover:bg-indigo-900/30">
+                                                                        <svg class="w-4 h-4" fill="currentColor"
+                                                                            viewBox="0 0 20 20"
+                                                                            xmlns="http://www.w3.org/2000/svg">
+                                                                            <path
+                                                                                d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z">
+                                                                            </path>
+                                                                        </svg>
+                                                                    </a>
+                                                                    <button
+                                                                        wire:click="confirmSessionDeletion({{ $session->id }})"
+                                                                        class="text-red-600 hover:text-red-900 dark:text-red-400 p-1 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30">
+                                                                        <svg class="w-4 h-4" fill="currentColor"
+                                                                            viewBox="0 0 20 20"
+                                                                            xmlns="http://www.w3.org/2000/svg">
+                                                                            <path fill-rule="evenodd"
+                                                                                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                                                                clip-rule="evenodd"></path>
+                                                                        </svg>
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div class="mt-3 flex justify-end">
+                                            <a href="{{ route('class-sessions.create', ['activity_id' => $activity->id]) }}"
+                                                class="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                <svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 20 20"
+                                                    xmlns="http://www.w3.org/2000/svg">
+                                                    <path fill-rule="evenodd"
+                                                        d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                                                        clip-rule="evenodd"></path>
+                                                </svg>
+                                                Añadir sesión
+                                            </a>
+                                        </div>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @endif
                 @empty
-                    <tr>
-                        <td colspan="6"
-                            class="px-6 py-8 text-center text-sm font-medium text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50">
-                            <div class="flex flex-col items-center justify-center space-y-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400"
-                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <span class="text-lg">No se encontraron actividades</span>
-                                <p class="text-gray-500 dark:text-gray-400 text-sm">Intenta con otros criterios de
-                                    búsqueda o crea una nueva actividad</p>
-                            </div>
-                        </td>
-                    </tr>
+                    <!-- Mensaje de "No se encontraron actividades" -->
                 @endforelse
             </tbody>
         </table>
@@ -368,4 +511,54 @@
             </div>
         </div>
     @endif
+    @if ($showSessionDeleteModal)
+        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+            aria-modal="true">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 backdrop-blur-sm transition-opacity"></div>
+            <div class="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <div
+                    class="relative inline-block overflow-hidden text-left align-bottom bg-white rounded-lg shadow-xl dark:bg-gray-800 sm:my-8 sm:align-middle sm:max-w-lg sm:w-full transform transition-all sm:scale-100 opacity-100">
+                    <div class="px-4 pt-5 pb-4 bg-white dark:bg-gray-800 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <div
+                                class="flex items-center justify-center flex-shrink-0 w-12 h-12 mx-auto bg-red-100 rounded-full dark:bg-red-900 sm:mx-0 sm:h-10 sm:w-10">
+                                <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                            </div>
+                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">
+                                    Eliminar sesión
+                                </h3>
+                                <div class="mt-2">
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                                        ¿Estás seguro que deseas eliminar esta sesión de
+                                        {{ $sessionToDelete ? $sessionToDelete->dia_semana : '' }}
+                                        {{ $sessionToDelete ? \Carbon\Carbon::parse($sessionToDelete->hora_inicio)->format('H:i') : '' }}
+                                        -
+                                        {{ $sessionToDelete ? \Carbon\Carbon::parse($sessionToDelete->hora_fin)->format('H:i') : '' }}?
+                                        Esta acción no se puede deshacer.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button wire:click="deleteSession" type="button"
+                            class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-red-600 border border-transparent rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                            Eliminar
+                        </button>
+                        <button wire:click="cancelSessionDeletion" type="button"
+                            class="inline-flex justify-center w-full px-4 py-2 mt-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
 </div>
